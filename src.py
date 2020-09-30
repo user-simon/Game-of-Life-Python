@@ -1,0 +1,82 @@
+import tkinter as tk
+import random
+
+CANVAS_SIZE = 500
+RESOLUTION  = 75
+INTERVAL    = 50
+CELL_SIZE   = CANVAS_SIZE / RESOLUTION
+
+BG = "black"
+FG = "white"
+
+root = tk.Tk()
+canvas = tk.Canvas(root, width=CANVAS_SIZE, height=CANVAS_SIZE, bg=BG)
+canvas.pack()
+
+def get_cell_val(x : int, y : int, grid : list) -> bool:
+    return (grid[y] >> x) & 0b1
+
+def set_cell_val(x : int, y : int, val : bool, grid : list):
+    bit = 0b1 << x
+
+    if val:
+        grid[y] |= bit
+    else:
+        grid[y] &= ~bit
+
+def in_bounds(x : int, y : int) -> bool:
+    num_in_bounds = lambda n : n >= 0 and n < RESOLUTION
+    return num_in_bounds(x) and num_in_bounds(y)
+
+def get_neighbors(x : int, y : int, grid : list) -> int:
+    n = 0
+
+    for dy in range(-1, 2):
+        for dx in range(-1, 2):
+            if dx == 0 and dy == 0:
+                continue
+
+            nx = x + dx
+            ny = y + dy
+
+            if not in_bounds(nx, ny):
+                continue
+
+            if get_cell_val(nx, ny, grid):
+                n += 1
+
+    return n
+
+def draw_cell(x : int, y : int):
+    canvas_x = x * CELL_SIZE
+    canvas_y = y * CELL_SIZE
+    canvas.create_rectangle(canvas_x, canvas_y, canvas_x + CELL_SIZE, canvas_y + CELL_SIZE, fill=FG, outline="")
+
+def update(old_grid : list):
+    canvas.delete("all")
+    grid = old_grid.copy()
+
+    for y in range(RESOLUTION):
+        for x in range(RESOLUTION):
+            n = get_neighbors(x, y, old_grid)
+
+            if n < 2 or n > 3:
+                set_cell_val(x, y, False, grid)
+            elif n == 3:
+                set_cell_val(x, y, True, grid)
+            
+            if get_cell_val(x, y, grid):
+                draw_cell(x, y)
+
+    root.after(INTERVAL, update, grid)
+
+# program start
+grid = [0] * RESOLUTION
+
+# randomize initial grid state
+for y in range(RESOLUTION):
+    grid[y] = random.randint(0, 2**RESOLUTION - 1)
+
+print(bin(2**RESOLUTION - 1))
+update(grid)
+root.mainloop()
