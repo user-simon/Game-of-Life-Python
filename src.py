@@ -3,7 +3,7 @@ import random
 
 # settings
 
-CANVAS_SIZE = 500
+CANVAS_SIZE = 750
 RESOLUTION  = 75
 INTERVAL    = 50
 CELL_SIZE   = CANVAS_SIZE / RESOLUTION
@@ -72,6 +72,7 @@ def update(old_grid : list):
                 set_cell_val(x, y, False, grid)
             elif n == 3:
                 set_cell_val(x, y, True, grid)
+            # else, cells are the same as previous generation which is accounted for in copying the old grid to the new grid
             
             # only draw cell if it's alive, for performance
             if get_cell_val(x, y, grid):
@@ -80,11 +81,13 @@ def update(old_grid : list):
     root.after(INTERVAL, update, grid)
 
 # program start
-grid = [0] * RESOLUTION
+grid = []
+max_val = 2**RESOLUTION - 1
 
 # randomize initial grid state
 for y in range(RESOLUTION):
-    grid[y] = random.randint(0, 2**RESOLUTION - 1)
+    # since rows are stored in integers, we can randomzie rows by assigning it a random int
+    grid.append(random.randint(0, max_val))
 
 update(grid)
 root.mainloop()
