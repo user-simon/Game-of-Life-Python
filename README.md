@@ -1,4 +1,4 @@
-# An implemenation of Conway's (R.I.P) Game of Life in Python.
+# An implementation of Conway's (R.I.P) Game of Life in Python.
 
 Game of Life implementation with a randomized initial grid state and drawn using TKinter.
 
